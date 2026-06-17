@@ -56,3 +56,35 @@ Use Cases:
 * Scene exploration
 * Character development
 * Film and theatre writing exercises
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Sundaram6/ai-script-tools.git
+```
+
+Go into the project folder:
+
+```bash
+cd ai-script-tools
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the Monologue Generator:
+
+```bash
+streamlit run monologue_generator.py
+```
+
+Run the Script Generator:
+
+```bash
+streamlit run script_generator.py
+```
