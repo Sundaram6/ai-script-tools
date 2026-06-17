@@ -187,6 +187,31 @@ emotion = st.selectbox(
     options=EMOTIONS
 )
 
+age_range = st.selectbox(
+    "Actor Age Range",
+    [
+        "18-25",
+        "25-35",
+        "35-50",
+        "50+"
+    ]
+)
+
+medium = st.selectbox(
+    "Performance Medium",
+    [
+        "Film",
+        "OTT",
+        "Theatre"
+    ]
+)
+emotional_intensity = st.slider(
+    "Emotional Intensity",
+    min_value=1,
+    max_value=10,
+    value=5
+)
+
 situation = st.text_area(
     "What has just happened before this monologue begins?",
     placeholder="e.g. He just got rejected from his 47th audition and is sitting alone outside the casting office...",
@@ -238,11 +263,26 @@ def generate_monologue(api_key, model, temperature, system_instruction, prompt):
     return None
 
 # ── BUILD PROMPT ─────────────────────────────────────
-def build_prompt(archetype, emotion, situation, spoken_to, extra, target_words, language):
+def build_prompt(
+    archetype,
+    emotion,
+    age_range,
+    medium,
+    emotional_intensity,
+    situation,
+    spoken_to,
+    extra,
+    target_words,
+    language
+):
+
     return f"""
 Write an audition monologue with these exact parameters:
 
 Character archetype: {archetype}
+Character Age Range: {age_range}
+Performance medium: {medium}
+Emotional intensity: {emotional_intensity}/10
 Dominant emotion: {emotion}
 Situation (what just happened): {situation}
 Speaking to: {spoken_to}
