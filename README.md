@@ -37,3 +37,22 @@ Features:
 Sundaram Sharma
 
 Actor • Writer • Filmmaker • AI Builder
+
+### 🎬 Script Generator
+
+Generate screenplay scenes using AI.
+
+Features:
+
+* Multiple creative personas
+* Character generation
+* Scene generation
+* Structured JSON output
+* Streamlit web interface
+
+Use Cases:
+
+* Screenwriting practice
+* Scene exploration
+* Character development
+* Film and theatre writing exercises
