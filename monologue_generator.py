@@ -25,30 +25,6 @@ st.markdown("""
     white-space: pre-wrap;
     border-left: 3px solid #e50914;
 }
-.meta-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 3px;
-}
-.meta-value {
-    font-size: 15px;
-    font-weight: 500;
-    color: #f0f0f0;
-    margin-bottom: 1.2rem;
-}
-.tag {
-    display: inline-block;
-    background: #1a1a1a;
-    color: #aaa;
-    font-size: 12px;
-    padding: 3px 10px;
-    border-radius: 20px;
-    margin-right: 6px;
-    border: 1px solid #333;
-}
 .practice-tip {
     background: #1a1a2e;
     border-left: 3px solid #4a90e2;
@@ -57,6 +33,16 @@ st.markdown("""
     font-size: 13px;
     color: #ccc;
     line-height: 1.7;
+    margin-top: 1rem;
+}
+.acting-coach-box {
+    background: #0d1f0d;
+    border-left: 3px solid #2ecc71;
+    padding: 1rem 1.25rem;
+    border-radius: 0 8px 8px 0;
+    font-size: 13px;
+    color: #ccc;
+    line-height: 1.8;
     margin-top: 1rem;
 }
 </style>
@@ -80,10 +66,8 @@ with st.sidebar:
     model_choice = st.selectbox(
         "Model",
         options=[
-            "models/gemini-2.0-flash-lite",
-            "models/gemini-2.5-flash-lite",
-            "models/gemini-2.5-flash",
-            "models/gemini-2.5-pro",
+            "gemini-2.5-flash",
+            "gemini-2.5-pro",
         ],
         index=0
     )
@@ -189,22 +173,14 @@ emotion = st.selectbox(
 
 age_range = st.selectbox(
     "Actor Age Range",
-    [
-        "18-25",
-        "25-35",
-        "35-50",
-        "50+"
-    ]
+    ["18-25", "25-35", "35-50", "50+"]
 )
 
 medium = st.selectbox(
     "Performance Medium",
-    [
-        "Film",
-        "OTT",
-        "Theatre"
-    ]
+    ["Film", "OTT", "Theatre"]
 )
+
 emotional_intensity = st.slider(
     "Emotional Intensity",
     min_value=1,
@@ -262,20 +238,11 @@ def generate_monologue(api_key, model, temperature, system_instruction, prompt):
     st.error("All retries failed. Switch model or wait a few minutes.")
     return None
 
-# ── BUILD PROMPT ─────────────────────────────────────
 def build_prompt(
-    archetype,
-    emotion,
-    age_range,
-    medium,
-    emotional_intensity,
-    situation,
-    spoken_to,
-    extra,
-    target_words,
-    language
+    archetype, emotion, age_range, medium,
+    emotional_intensity, situation, spoken_to,
+    extra, target_words, language
 ):
-
     return f"""
 Write an audition monologue with these exact parameters:
 
@@ -303,7 +270,11 @@ Return ONLY valid JSON in this exact structure:
   "emotional_arc": "Start emotion → turning point → end emotion",
   "monologue": "The full monologue text here",
   "director_note": "One sentence on how this should be performed — the key to unlocking it",
-  "practice_tip": "One specific physical or vocal technique Sundaram can use to rehearse this"
+  "practice_tip": "One specific physical or vocal technique Sundaram can use to rehearse this",
+  "objective": "What does this character want more than anything in this moment?",
+  "obstacle": "What is stopping them from getting it — internal or external?",
+  "subtext": "What is the character NOT saying but feeling underneath every line?",
+  "given_circumstances": "The four Ws — who, where, when, and what just happened — in two sentences"
 }}
 """
 
@@ -317,9 +288,11 @@ if generate_btn:
         st.error("Fill in who the character is speaking to.")
     else:
         system_instruction = SYSTEM_INSTRUCTIONS[language]
+
         prompt = build_prompt(
-            archetype, emotion, situation,
-            spoken_to, extra, target_words, language
+            archetype, emotion, age_range, medium,
+            emotional_intensity, situation, spoken_to,
+            extra, target_words, language
         )
 
         with st.spinner("Writing your monologue..."):
@@ -342,19 +315,22 @@ if generate_btn:
 
                 # ── CHARACTER CARD ───────────────────────────
                 st.markdown("### Character")
-                col1, col2 = st.columns([1, 2])
+                with st.container(border=True):
+                    col1, col2 = st.columns([1, 2])
 
-                with col1:
-                    st.markdown('<p class="meta-label">Name & Age</p>', unsafe_allow_html=True)
-                    st.markdown(f'<p class="meta-value">{data["character_name"]}, {data["character_age"]}</p>', unsafe_allow_html=True)
-                    st.markdown('<p class="meta-label">Speaking To</p>', unsafe_allow_html=True)
-                    st.markdown(f'<p class="meta-value">{data["spoken_to"]}</p>', unsafe_allow_html=True)
+                    with col1:
+                        st.markdown("**Name & Age**")
+                        st.write(f"{data['character_name']}, {data['character_age']}")
 
-                with col2:
-                    st.markdown('<p class="meta-label">Who They Are</p>', unsafe_allow_html=True)
-                    st.markdown(f'<p class="meta-value">{data["character_description"]}</p>', unsafe_allow_html=True)
-                    st.markdown('<p class="meta-label">Emotional Arc</p>', unsafe_allow_html=True)
-                    st.markdown(f'<p class="meta-value">{data["emotional_arc"]}</p>', unsafe_allow_html=True)
+                        st.markdown("**Speaking To**")
+                        st.write(data["spoken_to"])
+
+                    with col2:
+                        st.markdown("**Who They Are**")
+                        st.write(data["character_description"])
+
+                        st.markdown("**Emotional Arc**")
+                        st.write(data["emotional_arc"])
 
                 st.divider()
 
@@ -365,12 +341,33 @@ if generate_btn:
                     unsafe_allow_html=True
                 )
 
-                # ── DIRECTOR NOTE ────────────────────────────
+                # ── DIRECTOR NOTE + PRACTICE TIP ────────────
                 st.markdown(
                     f'<div class="practice-tip">🎬 <strong>Director\'s Note:</strong> {data["director_note"]}<br><br>'
                     f'🎯 <strong>Practice Tip for You:</strong> {data["practice_tip"]}</div>',
                     unsafe_allow_html=True
                 )
+
+                st.divider()
+
+                # ── ACTING COACH SECTION ─────────────────────
+                st.markdown("### 🎓 Acting Coach Notes")
+                with st.container(border=True):
+                    col1, col2 = st.columns(2)
+
+                    with col1:
+                        st.markdown("**🎯 Objective**")
+                        st.write(data.get("objective", "—"))
+
+                        st.markdown("**🧱 Obstacle**")
+                        st.write(data.get("obstacle", "—"))
+
+                    with col2:
+                        st.markdown("**💬 Subtext**")
+                        st.write(data.get("subtext", "—"))
+
+                        st.markdown("**🗺️ Given Circumstances**")
+                        st.write(data.get("given_circumstances", "—"))
 
                 st.divider()
 
@@ -388,6 +385,14 @@ EMOTIONAL ARC: {data['emotional_arc']}
 {'='*60}
 DIRECTOR'S NOTE: {data['director_note']}
 PRACTICE TIP: {data['practice_tip']}
+
+{'='*60}
+ACTING COACH NOTES
+{'='*60}
+OBJECTIVE: {data.get('objective', '—')}
+OBSTACLE: {data.get('obstacle', '—')}
+SUBTEXT: {data.get('subtext', '—')}
+GIVEN CIRCUMSTANCES: {data.get('given_circumstances', '—')}
 """
 
                 st.download_button(
