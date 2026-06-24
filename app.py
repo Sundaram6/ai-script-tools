@@ -16,6 +16,7 @@ from components.output_tabs import render_output_tabs
 from components.cards import render_character_card
 from components.character_cards import render_character_cards
 from components.advanced_options import render_advanced_options
+from components.presets import render_presets
 
 LOADING_MESSAGES = [
     "Building Character...",
