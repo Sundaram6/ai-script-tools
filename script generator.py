@@ -125,6 +125,17 @@ Standard screenplay format only. No commentary.
 """
 }
 
+# ── INPUT VALIDATION ─────────────────────────────────
+def validate_input(text: str, min_length: int = 10, max_length: int = 500) -> str | None:
+    """Validate text input. Returns error message or None."""
+    if not text or not text.strip():
+        return "This field is required."
+    if len(text.strip()) < min_length:
+        return f"Please write at least {min_length} characters."
+    if len(text.strip()) > max_length:
+        return f"Please keep it under {max_length} characters."
+    return None
+
 # ── MAIN INPUT ──────────────────────────────────────
 if st.session_state.script_history:
     with st.expander(f"📜 History ({len(st.session_state.script_history)} scenes)", expanded=False):
@@ -201,8 +212,8 @@ Return ONLY valid JSON, no extra text:
 if generate_btn:
     if not api_key:
         st.error("Please enter your Gemini API key in the sidebar.")
-    elif not user_request:
-        st.error("Please write what your scene is about.")
+    elif validate_input(user_request):
+        st.error(validate_input(user_request))
     else:
         system_instruction = get_system_instruction(persona, 
             custom_persona if persona == "Custom..." else "")

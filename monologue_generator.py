@@ -136,6 +136,17 @@ DURATIONS = {
     "2 minutes (~300 words)": 300
 }
 
+# ── INPUT VALIDATION ─────────────────────────────────
+def validate_input(text: str, min_length: int = 10, max_length: int = 500) -> str | None:
+    """Validate text input. Returns error message or None."""
+    if not text or not text.strip():
+        return "This field is required."
+    if len(text.strip()) < min_length:
+        return f"Please write at least {min_length} characters."
+    if len(text.strip()) > max_length:
+        return f"Please keep it under {max_length} characters."
+    return None
+
 # ── MAIN FORM ────────────────────────────────────────
 if st.session_state.monologue_history:
     with st.expander(f"📜 History ({len(st.session_state.monologue_history)} monologues)", expanded=False):
@@ -293,10 +304,10 @@ Return ONLY valid JSON in this exact structure:
 if generate_btn:
     if not api_key:
         st.error("Enter your Gemini API key in the sidebar.")
-    elif not situation:
-        st.error("Fill in the situation — what just happened before this monologue begins.")
-    elif not spoken_to:
-        st.error("Fill in who the character is speaking to.")
+    elif validate_input(situation):
+        st.error(validate_input(situation))
+    elif validate_input(spoken_to, min_length=3):
+        st.error(validate_input(spoken_to, min_length=3))
     else:
         system_instruction = SYSTEM_INSTRUCTIONS[language]
 
