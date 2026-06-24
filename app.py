@@ -66,6 +66,25 @@ def render_empty_state():
     )
 
 
+def render_footer():
+    """Render minimal branding footer."""
+    st.markdown(
+        """
+        <div style="
+            text-align: center;
+            padding: 2rem 0;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #333;
+            margin-top: 2rem;
+        ">
+            Monologue Generator AI — Built for Actors, Performers, and Storytellers
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def main():
     st.set_page_config(
         page_title="Monologue Generator",
@@ -74,6 +93,10 @@ def main():
     )
     
     st.markdown(MOBILE_CSS, unsafe_allow_html=True)
+    
+    # Initialize session state for last result
+    if "last_result" not in st.session_state:
+        st.session_state.last_result = None
     
     # Render hero
     render_hero()
@@ -128,6 +151,11 @@ def main():
         if result["success"]:
             st.success("Monologue generated successfully!")
             parsed_content = parse_response(result.get("content", ""))
+            # Store last result in session state
+            st.session_state.last_result = {
+                "inputs": inputs,
+                "parsed_content": parsed_content,
+            }
             render_character_card(inputs, parsed_content)
             render_output_tabs(inputs, parsed_content)
         else:
@@ -149,7 +177,16 @@ def main():
                 )
             st.error(friendly_error)
     else:
-        render_empty_state()
+        if st.session_state.last_result:
+            # Render last generated result
+            last = st.session_state.last_result
+            render_character_card(last["inputs"], last["parsed_content"])
+            render_output_tabs(last["inputs"], last["parsed_content"])
+        else:
+            render_empty_state()
+    
+    # Render footer
+    render_footer()
 
 
 if __name__ == "__main__":
