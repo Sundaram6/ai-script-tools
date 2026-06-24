@@ -12,6 +12,7 @@ from components.hero import render_hero
 from components.sidebar import render_sidebar, LANGUAGE_MAP
 from components.parser import parse_response
 from components.output_tabs import render_output_tabs
+from components.cards import render_character_card
 
 LOADING_MESSAGES = [
     "Building Character...",
@@ -82,6 +83,7 @@ def main():
         if result["success"]:
             st.success("Monologue generated successfully!")
             parsed_content = parse_response(result.get("content", ""))
+            render_character_card(inputs, parsed_content)
             render_output_tabs(inputs, parsed_content)
         else:
             st.error(result.get("error", "Generation failed."))

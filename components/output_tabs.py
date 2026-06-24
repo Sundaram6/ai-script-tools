@@ -2,8 +2,6 @@
 
 import streamlit as st
 
-from .cards import render_character_card
-
 
 def render_output_tabs(inputs: dict, parsed_content: dict):
     """Render the output workspace with 5 tabs.
@@ -21,9 +19,6 @@ def render_output_tabs(inputs: dict, parsed_content: dict):
     ])
     
     with tab1:
-        st.subheader("Character Summary")
-        render_character_card(inputs, parsed_content)
-        
         monologue = parsed_content.get("monologue", {})
         if monologue:
             st.subheader("Monologue")
