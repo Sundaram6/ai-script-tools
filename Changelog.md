@@ -1,4 +1,26 @@
-## Version 0.2.0 - 20 June 2026
+# Changelog
+
+## v0.3.0 - 24 June 2026
+
+### Added
+- Shared Gemini client module (`gemini_client.py`) with retry logic and JSON parsing
+- Unit tests for Gemini client (`gemini_client_test.py`)
+- Session history — revisit generated monologues and scenes
+- Copy to clipboard button for monologues and scenes
+- Download all history as text file
+- Input validation for required fields
+
+### Changed
+- Refactored both generators to use shared Gemini client
+- Removed duplicated API call/retry/parse logic from both apps
+- Pinned dependency versions in requirements.txt
+
+### Fixed
+- Improved error handling on API failures
+
+---
+
+## v0.2.0 - 20 June 2026
 
 ### Added
 - Character profile card
@@ -17,9 +39,7 @@
 - Improved Gemini model selection
 - Improved monologue output formatting
 
-
-
-# Changelog
+---
 
 ## v1.0.0 - June 2026
 
