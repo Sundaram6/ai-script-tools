@@ -24,6 +24,9 @@
 - Removed old monolith files (monologue_generator.py, script generator.py)
 - Reorganized into components/, services/, utils/ packages
 
+### Fixed
+- Fixed `StreamlitValueAssignmentNotAllowedError` on character card selection by refactoring button state management to use native Streamlit styling instead of manual session state assignments.
+
 ### Removed
 - Old monologue_generator.py and script generator.py
 

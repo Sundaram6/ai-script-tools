@@ -75,39 +75,27 @@ def _render_card_group(options: list, key_prefix: str) -> str:
     """
     st.markdown(CARD_CSS, unsafe_allow_html=True)
     
+    # Initialize default selection BEFORE creating widgets
+    if f"{key_prefix}_selected" not in st.session_state:
+        st.session_state[f"{key_prefix}_selected"] = options[0]["label"]
+    
     cols = st.columns(len(options))
-    selected = None
     
     for i, option in enumerate(options):
         with cols[i]:
-            btn_key = f"{key_prefix}_{option['label']}"
-            is_selected = st.session_state.get(btn_key, False)
-            
-            selected_class = "selected" if is_selected else ""
+            btn_key = f"{key_prefix}_btn_{option['label']}"
+            is_selected = st.session_state[f"{key_prefix}_selected"] == option["label"]
             
             if st.button(
                 f"{option['icon']} {option['label']}",
                 key=btn_key,
                 use_container_width=True,
+                type="primary" if is_selected else "secondary",
             ):
-                # Clear other selections in this group
-                for opt in options:
-                    st.session_state[f"{key_prefix}_{opt['label']}"] = False
-                st.session_state[btn_key] = True
+                st.session_state[f"{key_prefix}_selected"] = option["label"]
                 st.rerun()
     
-    # Get selected value
-    for option in options:
-        if st.session_state.get(f"{key_prefix}_{option['label']}", False):
-            selected = option["label"]
-            break
-    
-    # Default to first option if nothing selected
-    if selected is None:
-        selected = options[0]["label"]
-        st.session_state[f"{key_prefix}_{options[0]['label']}"] = True
-    
-    return selected
+    return st.session_state[f"{key_prefix}_selected"]
 
 
 def render_character_cards() -> dict:
