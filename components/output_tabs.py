@@ -2,6 +2,13 @@
 
 import streamlit as st
 
+from components.downloads import (
+    copy_monologue,
+    copy_full_output,
+    download_monologue_txt,
+    download_full_output_txt,
+)
+
 
 _MONOLOGUE_CSS = """
 <style>
@@ -166,6 +173,12 @@ def _render_monologue(parsed_content: dict):
         unsafe_allow_html=True,
     )
 
+    col1, col2 = st.columns(2)
+    with col1:
+        copy_monologue(text)
+    with col2:
+        download_monologue_txt(text)
+
 
 def _render_breakdown(parsed_content: dict):
     breakdown = parsed_content.get("character_breakdown", {})
@@ -264,5 +277,11 @@ def _render_full_output(parsed_content: dict):
             disabled=True,
             label_visibility="collapsed",
         )
+
+        col1, col2 = st.columns(2)
+        with col1:
+            copy_full_output(parsed_content)
+        with col2:
+            download_full_output_txt(parsed_content)
     else:
         st.info("No output available.")
