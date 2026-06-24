@@ -51,6 +51,10 @@ st.title("🎭 Monologue Generator")
 st.caption("Built for audition practice · Powered by Gemini")
 st.divider()
 
+# ── SESSION HISTORY ──────────────────────────────────
+if "monologue_history" not in st.session_state:
+    st.session_state.monologue_history = []
+
 # ── SIDEBAR ─────────────────────────────────────────
 with st.sidebar:
     st.header("⚙️ Settings")
@@ -133,6 +137,15 @@ DURATIONS = {
 }
 
 # ── MAIN FORM ────────────────────────────────────────
+if st.session_state.monologue_history:
+    with st.expander(f"📜 History ({len(st.session_state.monologue_history)} monologues)", expanded=False):
+        for i, entry in enumerate(reversed(st.session_state.monologue_history)):
+            st.markdown(f"**{entry['character_name']}**, {entry['character_age']} — {entry['timestamp']}")
+            st.markdown(f"*{entry['emotional_arc']}*")
+            st.code(entry['monologue'][:200] + "..." if len(entry['monologue']) > 200 else entry['monologue'])
+            if i < len(st.session_state.monologue_history) - 1:
+                st.divider()
+
 st.subheader("Build Your Monologue")
 
 col1, col2 = st.columns(2)
@@ -379,6 +392,15 @@ GIVEN CIRCUMSTANCES: {data.get('given_circumstances', '—')}
                 mime="text/plain",
                 use_container_width=True
             )
+
+            # Save to history
+            st.session_state.monologue_history.append({
+                "character_name": data["character_name"],
+                "character_age": data["character_age"],
+                "monologue": data["monologue"],
+                "emotional_arc": data["emotional_arc"],
+                "timestamp": time.strftime("%Y-%m-%d %H:%M"),
+            })
 
         else:
             st.error("Couldn't parse response. Try again.")

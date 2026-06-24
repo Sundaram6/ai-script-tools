@@ -1,4 +1,5 @@
 import streamlit as st
+import time
 from gemini_client import generate_json
 
 # ── PAGE CONFIG ─────────────────────────────────────
@@ -41,6 +42,10 @@ st.markdown("""
 st.title("🎬 Script Generator")
 st.caption("Powered by Gemini · Bollywood Showrunner Mode")
 st.divider()
+
+# ── SESSION HISTORY ──────────────────────────────────
+if "script_history" not in st.session_state:
+    st.session_state.script_history = []
 
 # ── SIDEBAR CONTROLS ────────────────────────────────
 with st.sidebar:
@@ -121,6 +126,15 @@ Standard screenplay format only. No commentary.
 }
 
 # ── MAIN INPUT ──────────────────────────────────────
+if st.session_state.script_history:
+    with st.expander(f"📜 History ({len(st.session_state.script_history)} scenes)", expanded=False):
+        for i, entry in enumerate(reversed(st.session_state.script_history)):
+            st.markdown(f"**{entry['character_name']}** — {entry['scene_heading']}")
+            st.markdown(f"*{entry['timestamp']}*")
+            st.code(entry['scene_text'][:200] + "..." if len(entry['scene_text']) > 200 else entry['scene_text'])
+            if i < len(st.session_state.script_history) - 1:
+                st.divider()
+
 st.subheader("Your Scene Brief")
 
 user_request = st.text_area(
@@ -223,5 +237,13 @@ LOGLINE: {data['logline']}
                 mime="text/plain",
                 use_container_width=True
             )
+
+            # Save to history
+            st.session_state.script_history.append({
+                "scene_heading": data["scene_heading"],
+                "character_name": data["character_name"],
+                "scene_text": data["scene_text"],
+                "timestamp": time.strftime("%Y-%m-%d %H:%M"),
+            })
         else:
             st.error("Couldn't parse response. Try again.")
