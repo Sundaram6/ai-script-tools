@@ -1,6 +1,7 @@
 """Download and copy functionality for Monologue Generator."""
 
 import streamlit as st
+from fpdf import FPDF
 
 
 def copy_monologue(text: str) -> None:
@@ -106,3 +107,75 @@ def _format_full_output(parsed_content: dict) -> str:
         sections.append("\n")
 
     return "".join(sections)
+
+
+def download_monologue_pdf(text: str, filename: str = "monologue.pdf") -> None:
+    """Display a download button for monologue in PDF format.
+    
+    Args:
+        text: The monologue text to download.
+        filename: The default filename for the download.
+    """
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    
+    # Add title
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(0, 10, txt="Monologue", ln=True, align="C")
+    pdf.ln(10)
+    
+    # Add monologue text
+    pdf.set_font("Arial", size=12)
+    pdf.multi_cell(0, 10, txt=text)
+    
+    pdf_bytes = pdf.output(dest="S").encode("latin-1")
+    
+    st.download_button(
+        label="📄 Download PDF",
+        data=pdf_bytes,
+        file_name=filename,
+        mime="application/pdf",
+        key="download_monologue_pdf",
+    )
+
+
+def download_full_output_pdf(parsed_content: dict, filename: str = "monologue_full_output.pdf") -> None:
+    """Display a download button for full output in PDF format.
+    
+    Args:
+        parsed_content: The parsed content dictionary.
+        filename: The default filename for the download.
+    """
+    full_text = _format_full_output(parsed_content)
+    
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    
+    # Add title
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(0, 10, txt="Monologue - Full Output", ln=True, align="C")
+    pdf.ln(10)
+    
+    # Add full output text
+    pdf.set_font("Arial", size=12)
+    pdf.multi_cell(0, 10, txt=full_text)
+    
+    pdf_bytes = pdf.output(dest="S").encode("latin-1")
+    
+    st.download_button(
+        label="📄 Download Full PDF",
+        data=pdf_bytes,
+        file_name=filename,
+        mime="application/pdf",
+        key="download_full_pdf",
+    )
+
+
+def render_generate_another_button():
+    """Render a button to generate another version."""
+    if st.button("🔄 Generate Another Version", key="generate_another", 
+                 help="Generate another version with same settings"):
+        st.session_state.generate_another = True
+        st.rerun()

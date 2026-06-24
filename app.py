@@ -17,6 +17,8 @@ from components.cards import render_character_card
 from components.character_cards import render_character_cards
 from components.advanced_options import render_advanced_options
 from components.presets import render_presets
+from components.history import init_history, add_to_history, render_history_button, render_history_panel
+from components.downloads import copy_monologue, copy_full_output, download_monologue_txt, download_full_output_txt, download_monologue_pdf, download_full_output_pdf, render_generate_another_button
 
 LOADING_MESSAGES = [
     "Building Character...",
@@ -165,8 +167,17 @@ def main():
     if "last_result" not in st.session_state:
         st.session_state.last_result = None
     
+    # Initialize history
+    init_history()
+    
     # Render hero
     render_hero()
+    
+    # Render history button in top-right
+    render_history_button()
+    
+    # Render history panel if enabled
+    render_history_panel()
     
     # Render API key panel and get key
     api_key = render_api_panel()
@@ -208,6 +219,7 @@ def main():
             "inputs": inputs,
             "parsed_content": parsed_content,
         }
+        add_to_history(inputs, parsed_content)
         st.success("Demo monologue loaded!")
         render_character_card(inputs, parsed_content)
         render_output_tabs(inputs, parsed_content)
@@ -231,6 +243,12 @@ def main():
         use_container_width=True,
     )
     st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Check if "Generate Another Version" was clicked
+    generate_another = st.session_state.get("generate_another", False)
+    if generate_another:
+        st.session_state.generate_another = False
+        generate_clicked = True
 
     if generate_clicked:
         if not api_key:
@@ -298,6 +316,7 @@ def main():
                 "inputs": inputs,
                 "parsed_content": parsed_content,
             }
+            add_to_history(inputs, parsed_content)
             render_character_card(inputs, parsed_content)
             render_output_tabs(inputs, parsed_content)
         else:

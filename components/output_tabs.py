@@ -7,6 +7,9 @@ from components.downloads import (
     copy_full_output,
     download_monologue_txt,
     download_full_output_txt,
+    download_monologue_pdf,
+    download_full_output_pdf,
+    render_generate_another_button,
 )
 
 
@@ -188,11 +191,13 @@ def _render_monologue(parsed_content: dict):
         unsafe_allow_html=True,
     )
 
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     with col1:
         copy_monologue(text)
     with col2:
         download_monologue_txt(text)
+    with col3:
+        download_monologue_pdf(text)
 
 
 def _render_breakdown(parsed_content: dict):
@@ -293,10 +298,15 @@ def _render_full_output(parsed_content: dict):
             label_visibility="collapsed",
         )
 
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
         with col1:
             copy_full_output(parsed_content)
         with col2:
             download_full_output_txt(parsed_content)
+        with col3:
+            download_full_output_pdf(parsed_content)
+        
+        st.markdown("---")
+        render_generate_another_button()
     else:
         st.info("No output available.")
