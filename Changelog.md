@@ -1,5 +1,34 @@
 # Changelog
 
+## v0.6.0 - 24 June 2026
+
+### Added
+- One-click generation: Select Age + Gender → Generate
+- Smart AI engine that auto-chooses character details
+- Character card selectors (Gender, Age, Language)
+- Quick preset chips (Broken Heart, Betrayal, Dreamer, etc.)
+- Demo mode with sample monologues (no API key required)
+- API key persistence in session state
+- Collapsible advanced options for power users
+- Category tabs (Random, Film, Theatre, OTT)
+- AI Character Creator with Name, Age, Occupation, Core Wound, Goal
+- Premium output tabs (Monologue, Character, Acting Notes, Full Package)
+- History system storing last 10 generations
+- PDF download support
+- "Generate Another Version" button
+- Improved mobile-responsive layout
+
+### Changed
+- Simplified UX from 10 fields to 3 essentials (Age, Gender, Language)
+- Moved advanced options to collapsible section
+- Removed old monolith files (monologue_generator.py, script generator.py)
+- Reorganized into components/, services/, utils/ packages
+
+### Removed
+- Old monologue_generator.py and script generator.py
+
+---
+
 ## v0.5.0 - 24 June 2026
 
 ### Added
