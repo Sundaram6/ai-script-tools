@@ -15,6 +15,7 @@ from components.parser import parse_response
 from components.output_tabs import render_output_tabs
 from components.cards import render_character_card
 from components.character_cards import render_character_cards
+from components.advanced_options import render_advanced_options
 
 LOADING_MESSAGES = [
     "Building Character...",
@@ -109,8 +110,14 @@ def main():
     # Render character cards on main page
     character_selections = render_character_cards()
     
-    # Render sidebar and get inputs
-    inputs, model, temperature = render_sidebar()
+    # Render sidebar and get model settings
+    model, temperature = render_sidebar()
+    
+    # Render advanced options on main page
+    advanced_options = render_advanced_options()
+    
+    # Create inputs dict from advanced options
+    inputs = advanced_options.copy()
     
     # Update inputs with character card selections
     inputs["gender"] = character_selections["gender"]
