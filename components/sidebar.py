@@ -27,7 +27,7 @@ EMOTIONS = [
 
 MEDIUMS = ["Film", "OTT", "TV Serial", "Theatre", "Commercial"]
 
-AGE_RANGES = ["Child", "Teen", "Young Adult", "Adult", "Elderly"]
+AGE_RANGES = ["Child", "Teen", "Young Adult", "Adult", "Senior"]
 
 LANGUAGES = ["Hindi", "English", "Hinglish"]
 
@@ -58,8 +58,6 @@ def render_sidebar():
         # Character Section
         st.subheader("Character")
         archetype = st.selectbox("Character Archetype", ARCHETYPES)
-        age_range = st.selectbox("Age Range", AGE_RANGES)
-        language = st.selectbox("Language", LANGUAGES)
         
         st.divider()
         
@@ -93,8 +91,6 @@ def render_sidebar():
         "emotion": emotion,
         "medium": medium,
         "intensity": intensity,
-        "age_range": age_range,
-        "language": language,
         "word_count": word_count,
         "situation": situation,
         "spoken_to": spoken_to,

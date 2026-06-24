@@ -14,6 +14,7 @@ from components.api_panel import render_api_panel, render_demo_mode
 from components.parser import parse_response
 from components.output_tabs import render_output_tabs
 from components.cards import render_character_card
+from components.character_cards import render_character_cards
 
 LOADING_MESSAGES = [
     "Building Character...",
@@ -105,8 +106,16 @@ def main():
     # Render API key panel and get key
     api_key = render_api_panel()
     
+    # Render character cards on main page
+    character_selections = render_character_cards()
+    
     # Render sidebar and get inputs
     inputs, model, temperature = render_sidebar()
+    
+    # Update inputs with character card selections
+    inputs["gender"] = character_selections["gender"]
+    inputs["age_range"] = character_selections["age"]
+    inputs["language"] = character_selections["language"]
     
     # Demo mode
     demo_monologue = render_demo_mode()
