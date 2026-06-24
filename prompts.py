@@ -12,6 +12,7 @@ def build_monologue_prompt(
     language: str,
     word_count: int,
     extra_instructions: str = "",
+    category: str = "Random",
 ) -> str:
     """Build a structured prompt for monologue generation.
 
@@ -26,11 +27,21 @@ def build_monologue_prompt(
         language: Language/style (Hindi Film, English Theatre, Hinglish).
         word_count: Target word count for the monologue.
         extra_instructions: Optional additional notes or requirements.
+        category: Monologue category (Random, Film, Theatre, OTT).
 
     Returns:
         A structured prompt string for Gemini.
     """
     extra_section = f"\nExtra instructions: {extra_instructions}" if extra_instructions else ""
+    
+    category_guidance = {
+        "Film": "\nStyle: FILM audition. Focus on realistic, grounded emotional moments. Subtle expressions, naturalistic delivery, cinematic realism.",
+        "Theatre": "\nStyle: THEATRE performance. Focus on larger-than-life emotions, projection, and stage presence. Bold choices, clear arcs, physical storytelling.",
+        "OTT": "\nStyle: OTT/web series. Focus on binge-worthy, complex characters with moral ambiguity. Character depth, grey shades, modern urban settings.",
+        "Random": "",
+    }
+    
+    category_section = category_guidance.get(category, "")
 
     return f"""Write an audition-ready monologue with these exact parameters:
 
@@ -42,7 +53,7 @@ Dominant emotion: {emotion}
 Situation (what just happened): {situation}
 Speaking to: {spoken_to}
 Target length: approximately {word_count} words
-Language style: {language}{extra_section}
+Language style: {language}{category_section}{extra_section}
 
 The monologue must have a clear arc — the character must be in a different emotional place at the end than at the start.
 Include one unexpected moment — a beat where the emotion shifts or the character surprises themselves.
@@ -94,6 +105,7 @@ def build_smart_monologue_prompt(
     gender: str,
     age: str,
     language: str,
+    category: str = "Random",
 ) -> str:
     """Build a smart generation prompt when user only provides gender, age, and language.
     
@@ -103,15 +115,26 @@ def build_smart_monologue_prompt(
         gender: Character gender (Male/Female).
         age: Age range label (Child/Teen/Young Adult/Adult/Senior).
         language: Language style (Hindi/English/Hinglish).
+        category: Monologue category (Random, Film, Theatre, OTT).
     
     Returns:
         A structured prompt string for Gemini.
     """
+    category_guidance = {
+        "Film": "\nThis is for a FILM audition. Focus on realistic, grounded emotional moments. Think close-up camera work — subtle expressions, naturalistic delivery, cinematic realism.",
+        "Theatre": "\nThis is for a THEATRE performance. Focus on larger-than-life emotions, projection, and stage presence. Think about reaching the back row — bold choices, clear arcs, physical storytelling.",
+        "OTT": "\nThis is for an OTT/web series. Focus on binge-worthy, complex characters with moral ambiguity. Think long-form storytelling — character depth, grey shades, modern urban settings.",
+        "Random": "\nChoose the most appropriate medium yourself. Let the character and story dictate the format.",
+    }
+    
+    guidance = category_guidance.get(category, category_guidance["Random"])
+
     return f"""Generate the most emotionally powerful, audition-worthy monologue for:
 
 Gender: {gender}
 Age: {age}
 Language: {language}
+{guidance}
 
 Choose the most compelling character, situation and emotional journey yourself.
 

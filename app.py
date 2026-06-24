@@ -42,6 +42,42 @@ MOBILE_CSS = """
     .monologue-reader { padding: 1rem !important; }
     .perf-grid { grid-template-columns: 1fr !important; }
 }
+.category-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin: 1.5rem 0;
+}
+.category-tab {
+    padding: 0.7rem 1.5rem;
+    border: 2px solid #444;
+    background: #1a1a2e;
+    color: #999;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.category-tab:first-child {
+    border-radius: 10px 0 0 10px;
+}
+.category-tab:last-child {
+    border-radius: 0 10px 10px 0;
+}
+.category-tab:hover {
+    border-color: #e94560;
+    color: #fff;
+}
+.category-tab.active {
+    border-color: #e94560;
+    background: linear-gradient(135deg, #e94560 0%, #c81e45 100%);
+    color: #fff;
+    box-shadow: 0 0 12px rgba(233, 69, 96, 0.4);
+}
+.generate-btn-wrapper {
+    text-align: center;
+    margin: 2rem 0;
+}
 </style>
 """
 
@@ -61,13 +97,40 @@ def render_empty_state():
             <div style="font-size: 4rem; margin-bottom: 1rem;">🎭</div>
             <h3 style="color: #e94560; margin-bottom: 0.5rem;">Ready to Create?</h3>
             <p style="color: #999; font-size: 1.1rem; max-width: 500px; margin: 0 auto;">
-                Your generated monologue will appear here. Choose a character, emotion,
-                and situation, then click <strong>Generate Monologue</strong>.
+                Your generated monologue will appear here. Choose a category, pick your character,
+                and click <strong>Generate Monologue</strong>.
             </p>
         </div>
         """,
         unsafe_allow_html=True,
     )
+
+
+CATEGORIES = ["Random", "Film", "Theatre", "OTT"]
+
+
+def render_category_tabs() -> str:
+    """Render category tabs and return selected category."""
+    if "selected_category" not in st.session_state:
+        st.session_state.selected_category = "Random"
+
+    st.markdown("### Choose a Category")
+
+    tab_cols = st.columns(4)
+    for i, cat in enumerate(CATEGORIES):
+        with tab_cols[i]:
+            is_active = st.session_state.selected_category == cat
+            active_class = "active" if is_active else ""
+            st.markdown(
+                f'<div class="category-tab {active_class}" style="text-align:center;">'
+                f"<strong>{cat}</strong></div>",
+                unsafe_allow_html=True,
+            )
+            if st.button(cat, key=f"cat_{cat}", use_container_width=True):
+                st.session_state.selected_category = cat
+                st.rerun()
+
+    return st.session_state.selected_category
 
 
 def render_footer():
@@ -107,6 +170,9 @@ def main():
     
     # Render API key panel and get key
     api_key = render_api_panel()
+    
+    # Render category tabs
+    category = render_category_tabs()
     
     # Render character cards on main page
     character_selections = render_character_cards()
@@ -148,8 +214,25 @@ def main():
         render_footer()
         return
     
-    # Generate button
-    if st.button("Generate Monologue", type="primary", use_container_width=True):
+    # Generate button — large centered CTA
+    st.markdown(
+        '<div class="generate-btn-wrapper">'
+        '<span style="font-size:0.9rem; color:#999;">Workflow: Category → Age + Gender + Language → Generate</span>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '<div style="text-align:center; margin-bottom:2rem;">',
+        unsafe_allow_html=True,
+    )
+    generate_clicked = st.button(
+        "✨ Generate Monologue",
+        type="primary",
+        use_container_width=True,
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    if generate_clicked:
         if not api_key:
             st.error(
                 "Please enter your Gemini API Key in the sidebar, "
@@ -167,6 +250,7 @@ def main():
                 gender=inputs["gender"],
                 age=inputs["age_range"],
                 language=language_mapped,
+                category=category,
             )
         else:
             # Full generation: validate all inputs
@@ -195,6 +279,7 @@ def main():
                 language=language_mapped,
                 word_count=inputs["word_count"],
                 extra_instructions=inputs["extra"],
+                category=category,
             )
         
         with st.spinner(random.choice(LOADING_MESSAGES)):
