@@ -43,6 +43,11 @@ MOBILE_CSS = """
     h3 { font-size: 1.2rem !important; }
     .monologue-reader { padding: 1rem !important; }
     .perf-grid { grid-template-columns: 1fr !important; }
+    .card-selector { flex-direction: column; }
+    .card-option { min-width: 100%; margin-bottom: 8px; }
+    [data-testid="stHorizontalBlock"] { flex-direction: column !important; }
+    .stColumn { width: 100% !important; }
+    .block-container { padding: 1rem !important; }
 }
 .category-tabs {
     display: flex;
@@ -97,10 +102,9 @@ def render_empty_state():
             margin: 2rem 0;
         ">
             <div style="font-size: 4rem; margin-bottom: 1rem;">🎭</div>
-            <h3 style="color: #e94560; margin-bottom: 0.5rem;">Ready to Create?</h3>
+            <h3 style="color: #e94560; margin-bottom: 0.5rem;">Ready to Create</h3>
             <p style="color: #999; font-size: 1.1rem; max-width: 500px; margin: 0 auto;">
-                Your generated monologue will appear here. Choose a category, pick your character,
-                and click <strong>Generate Monologue</strong>.
+                Select age and gender, then let AI build a complete character and monologue for you.
             </p>
         </div>
         """,
@@ -343,6 +347,8 @@ def main():
             last = st.session_state.last_result
             render_character_card(last["inputs"], last["parsed_content"])
             render_output_tabs(last["inputs"], last["parsed_content"])
+            st.markdown("---")
+            render_generate_another_button()
         else:
             render_empty_state()
     
