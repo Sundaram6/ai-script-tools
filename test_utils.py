@@ -1,6 +1,6 @@
 """Test utils module."""
 
-from utils import validate_inputs, clean_response
+from utils.storage import validate_inputs, clean_response
 
 
 def test_validate_inputs_valid():

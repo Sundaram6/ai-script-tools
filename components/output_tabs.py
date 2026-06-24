@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from components.downloads import (
+from utils.downloads import (
     copy_monologue,
     copy_full_output,
     download_monologue_txt,

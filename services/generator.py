@@ -1,6 +1,6 @@
 """Generator layer for monologue generation using Gemini API."""
 
-from gemini_client import generate_json
+from services.gemini_client import generate_json
 
 
 def generate_monologue(

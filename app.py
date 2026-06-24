@@ -4,21 +4,20 @@ import random
 
 import streamlit as st
 
-from prompts import build_monologue_prompt, build_smart_monologue_prompt
-from generator import generate_monologue
-from utils import validate_inputs, clean_response
+from services.prompts import build_monologue_prompt, build_smart_monologue_prompt
+from services.generator import generate_monologue
+from utils.storage import validate_inputs
 
 from components.hero import render_hero
 from components.sidebar import render_sidebar, LANGUAGE_MAP
 from components.api_panel import render_api_panel, render_demo_mode
-from components.parser import parse_response
+from utils.parser import parse_response
 from components.output_tabs import render_output_tabs
 from components.cards import render_character_card
 from components.character_cards import render_character_cards
 from components.advanced_options import render_advanced_options
-from components.presets import render_presets
 from components.history import init_history, add_to_history, render_history_button, render_history_panel
-from components.downloads import copy_monologue, copy_full_output, download_monologue_txt, download_full_output_txt, download_monologue_pdf, download_full_output_pdf, render_generate_another_button
+from utils.downloads import render_generate_another_button
 
 LOADING_MESSAGES = [
     "Building Character...",

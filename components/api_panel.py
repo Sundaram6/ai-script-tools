@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from components.parser import parse_response
+from utils.parser import parse_response
 
 DEMO_MONOLOGUES = [
     {
