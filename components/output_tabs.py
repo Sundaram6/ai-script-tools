@@ -13,11 +13,11 @@ def render_output_tabs(inputs: dict, parsed_content: dict):
         parsed_content: Parsed content from response.
     """
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
-        "Monologue",
-        "Character Breakdown",
-        "Emotional Beats",
-        "Performance Notes",
-        "Full Output",
+        "🎬 Monologue",
+        "🧠 Character Breakdown",
+        "🎭 Emotional Beats",
+        "🎤 Performance Notes",
+        "📄 Full Output",
     ])
     
     with tab1:

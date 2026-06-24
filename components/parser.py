@@ -58,13 +58,13 @@ def parse_response(response_text: str) -> dict:
     current_section = None
     section_content = []
     
-    # Define section markers (case-insensitive)
+    # Define section markers (case-insensitive) with variations
     section_markers = {
-        "character_profile": ["character profile", "character_profile"],
-        "character_breakdown": ["character breakdown", "character_breakdown"],
-        "monologue": ["monologue"],
-        "emotional_beats": ["emotional beats", "emotional_beats"],
-        "performance_notes": ["performance notes", "performance_notes"],
+        "character_profile": ["character profile", "character_profile", "character's profile"],
+        "character_breakdown": ["character breakdown", "character_breakdown", "character analysis"],
+        "monologue": ["monologue", "script", "dialogue", "scene"],
+        "emotional_beats": ["emotional beats", "emotional_beats", "emotional arc", "emotional journey"],
+        "performance_notes": ["performance notes", "performance_notes", "acting notes", "direction notes"],
     }
     
     for line in lines:
@@ -128,7 +128,7 @@ def _parse_section_content(section_type: str, content: str) -> dict:
     for line in content.split("\n"):
         stripped = line.strip()
         
-        # Check for key: value pattern
+        # Check for key: value pattern (handles **Key**: value and **Key**:value)
         match = re.match(r"^\*\*(.+?)\*\*:?\s*(.*)$", stripped)
         if match:
             # Save previous key-value
