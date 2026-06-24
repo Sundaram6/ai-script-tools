@@ -1,8 +1,5 @@
-import json
-import time
-from google import genai
-from google.genai import types
 import streamlit as st
+from gemini_client import generate_json
 
 # ── PAGE CONFIG ─────────────────────────────────────
 st.set_page_config(
@@ -146,8 +143,7 @@ def get_system_instruction(persona, custom_persona=""):
     return PERSONAS.get(persona, PERSONAS["Bollywood Veteran"])
 
 def generate_scene(api_key, model, temperature, system_instruction, user_request, extra_notes):
-    client = genai.Client(api_key=api_key)
-
+    """Generate a scene using the shared Gemini client."""
     prompt = f"""
 Write a short scene based on: {user_request}
 {f"Additional notes: {extra_notes}" if extra_notes else ""}
@@ -162,29 +158,18 @@ Return ONLY valid JSON, no extra text:
 }}
 """
 
-    for attempt in range(3):
-        try:
-            response = client.models.generate_content(
-                model=model,
-                config=types.GenerateContentConfig(
-                    system_instruction=system_instruction,
-                    temperature=temperature
-                ),
-                contents=prompt
-            )
-            return response.text
+    def on_retry(attempt, wait):
+        st.warning(f"Quota hit. Retrying in {wait}s... ({attempt + 1}/3)")
 
-        except Exception as e:
-            if "429" in str(e):
-                wait = 30 * (attempt + 1)
-                st.warning(f"Quota hit. Retrying in {wait} seconds... (attempt {attempt + 1}/3)")
-                time.sleep(wait)
-            else:
-                st.error(f"Error: {e}")
-                return None
-
-    st.error("All retries failed. Try a different model or wait a few minutes.")
-    return None
+    return generate_json(
+        api_key=api_key,
+        model=model,
+        temperature=temperature,
+        system_instruction=system_instruction,
+        prompt=prompt,
+        max_retries=3,
+        on_retry=on_retry,
+    )
 
 # ── OUTPUT ──────────────────────────────────────────
 if generate_btn:
@@ -197,57 +182,46 @@ if generate_btn:
             custom_persona if persona == "Custom..." else "")
 
         with st.spinner("Generating your scene..."):
-            raw_text = generate_scene(
+            data = generate_scene(
                 api_key, model_choice, temperature,
                 system_instruction, user_request, extra_notes
             )
 
-        if raw_text:
-            # Clean JSON
-            clean_text = raw_text.strip()
-            if clean_text.startswith("```"):
-                clean_text = clean_text.split("```")[1]
-                if clean_text.startswith("json"):
-                    clean_text = clean_text[4:]
+        if data:
 
-            try:
-                data = json.loads(clean_text.strip())
+            # Metadata row
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown('<p class="field-label">Scene</p>', unsafe_allow_html=True)
+                st.markdown(f'<p class="field-value">{data["scene_heading"]}</p>', unsafe_allow_html=True)
+                st.markdown('<p class="field-label">Character</p>', unsafe_allow_html=True)
+                st.markdown(f'<p class="field-value">{data["character_name"]} — {data["character_description"]}</p>', unsafe_allow_html=True)
 
-                # Metadata row
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.markdown('<p class="field-label">Scene</p>', unsafe_allow_html=True)
-                    st.markdown(f'<p class="field-value">{data["scene_heading"]}</p>', unsafe_allow_html=True)
-                    st.markdown('<p class="field-label">Character</p>', unsafe_allow_html=True)
-                    st.markdown(f'<p class="field-value">{data["character_name"]} — {data["character_description"]}</p>', unsafe_allow_html=True)
+            with col2:
+                st.markdown('<p class="field-label">Logline</p>', unsafe_allow_html=True)
+                st.markdown(f'<p class="field-value">{data["logline"]}</p>', unsafe_allow_html=True)
 
-                with col2:
-                    st.markdown('<p class="field-label">Logline</p>', unsafe_allow_html=True)
-                    st.markdown(f'<p class="field-value">{data["logline"]}</p>', unsafe_allow_html=True)
+            st.divider()
 
-                st.divider()
+            # Scene text
+            st.markdown("**Scene**")
+            st.markdown(f'<div class="scene-box">{data["scene_text"]}</div>', unsafe_allow_html=True)
 
-                # Scene text
-                st.markdown("**Scene**")
-                st.markdown(f'<div class="scene-box">{data["scene_text"]}</div>', unsafe_allow_html=True)
+            st.divider()
 
-                st.divider()
-
-                # Download button
-                full_output = f"""SCENE: {data['scene_heading']}
+            # Download button
+            full_output = f"""SCENE: {data['scene_heading']}
 CHARACTER: {data['character_name']} — {data['character_description']}
 LOGLINE: {data['logline']}
 
 {data['scene_text']}"""
 
-                st.download_button(
-                    label="⬇️ Download Scene",
-                    data=full_output,
-                    file_name="scene.txt",
-                    mime="text/plain",
-                    use_container_width=True
-                )
-
-            except json.JSONDecodeError:
-                st.error("Couldn't parse the response. Raw output below:")
-                st.code(raw_text)
+            st.download_button(
+                label="⬇️ Download Scene",
+                data=full_output,
+                file_name="scene.txt",
+                mime="text/plain",
+                use_container_width=True
+            )
+        else:
+            st.error("Couldn't parse response. Try again.")
