@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.4.0 - 24 June 2026
+
+### Added
+- New monologue generator app (`app.py`) with 5-section output (Character Profile, Character Breakdown, Monologue, Emotional Beats, Performance Notes)
+- Prompt builder module (`prompts.py`) for structured Gemini prompts
+- Generator layer (`generator.py`) wrapping Gemini API calls
+- Safety utilities (`utils.py`) for input validation and response cleaning
+- Tabbed output display (Monologue, Character Breakdown, Performance Notes)
+- `.env` file support via python-dotenv
+
+---
+
 ## v0.3.0 - 24 June 2026
 
 ### Added
