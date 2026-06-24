@@ -1,5 +1,7 @@
 """Streamlit app for Monologue Generator."""
 
+import random
+
 import streamlit as st
 
 from prompts import build_monologue_prompt
@@ -10,6 +12,14 @@ from components.hero import render_hero
 from components.sidebar import render_sidebar, LANGUAGE_MAP
 from components.parser import parse_response
 from components.output_tabs import render_output_tabs
+
+LOADING_MESSAGES = [
+    "Building Character...",
+    "Finding Emotional Truth...",
+    "Writing Scene...",
+    "Generating Monologue...",
+    "Preparing Acting Notes...",
+]
 
 
 def main():
@@ -61,7 +71,7 @@ def main():
             extra_instructions=inputs["extra"],
         )
         
-        with st.spinner("Generating your monologue..."):
+        with st.spinner(random.choice(LOADING_MESSAGES)):
             result = generate_monologue(
                 prompt=prompt,
                 api_key=api_key,
