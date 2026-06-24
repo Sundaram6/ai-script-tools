@@ -71,13 +71,13 @@ def _format_full_output(parsed_content: dict) -> str:
     """
     sections = []
 
-    monologue = parsed_content.get("monologue", {})
+    monologue = parsed_content.get("monologue") or {}
     if monologue.get("text"):
         sections.append("=== MONOLOGUE ===\n")
         sections.append(monologue["text"])
         sections.append("\n")
 
-    breakdown = parsed_content.get("character_breakdown", {})
+    breakdown = parsed_content.get("character_breakdown") or {}
     if breakdown:
         sections.append("\n=== CHARACTER BREAKDOWN ===\n")
         for key in ["objective", "obstacle", "stakes", "secret", "animal_reference"]:
@@ -90,7 +90,7 @@ def _format_full_output(parsed_content: dict) -> str:
                 sections.append(f"  - {trait}")
         sections.append("\n")
 
-    beats = parsed_content.get("emotional_beats", {})
+    beats = parsed_content.get("emotional_beats") or {}
     if beats:
         sections.append("\n=== EMOTIONAL BEATS ===\n")
         for key, value in beats.items():
@@ -98,7 +98,7 @@ def _format_full_output(parsed_content: dict) -> str:
             sections.append(f"{label}: {value}")
         sections.append("\n")
 
-    notes = parsed_content.get("performance_notes", {})
+    notes = parsed_content.get("performance_notes") or {}
     if notes:
         sections.append("\n=== PERFORMANCE NOTES ===\n")
         for key in ["voice", "pacing", "body_language", "eye_focus", "breathing_notes"]:

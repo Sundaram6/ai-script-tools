@@ -2,3 +2,9 @@ streamlit==1.58.0
 google-genai==2.10.0
 python-dotenv
 fpdf2
+fastapi
+uvicorn
+sqlalchemy
+alembic
+pydantic
+httpx

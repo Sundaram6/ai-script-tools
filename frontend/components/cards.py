@@ -11,7 +11,7 @@ def render_character_card(inputs: dict, parsed_content: dict):
         parsed_content: Parsed content from response (may contain character_profile).
     """
     # Extract character name from parsed content if available
-    character_profile = parsed_content.get("character_profile", {})
+    character_profile = parsed_content.get("character_profile") or {}
     character_name = character_profile.get("name", "Generated Character") if character_profile else "Generated Character"
     
     # Get age from profile or use age_range from inputs

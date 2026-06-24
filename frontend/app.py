@@ -4,8 +4,7 @@ import random
 
 import streamlit as st
 
-from services.prompts import build_monologue_prompt, build_smart_monologue_prompt
-from services.generator import generate_monologue
+from services import api_client
 from utils.storage import validate_inputs
 
 from components.hero import render_hero
@@ -182,10 +181,7 @@ def main():
     # Render history panel if enabled
     render_history_panel()
     
-    # Render API key panel and get key
-    api_key = render_api_panel()
-    
-    # Render category tabs
+    # Render demo mode (optional, left as is but api_key not needed)
     category = render_category_tabs()
     
     # Render character cards on main page
@@ -254,66 +250,29 @@ def main():
         generate_clicked = True
 
     if generate_clicked:
-        if not api_key:
-            st.error(
-                "Please enter your Gemini API Key in the sidebar, "
-                "or try Demo Mode above."
-            )
-            return
-        
         language_mapped = LANGUAGE_MAP.get(inputs["language"], inputs["language"])
         
-        # Check if situation is empty to decide between smart or full generation
-        situation_filled = inputs["situation"].strip()
-        if not situation_filled:
-            # Smart generation: user only provided gender, age, language
-            prompt = build_smart_monologue_prompt(
-                gender=inputs["gender"],
-                age=inputs["age_range"],
-                language=language_mapped,
-                category=category,
-            )
-        else:
-            # Full generation: validate all inputs
-            if not validate_inputs(
-                language=language_mapped,
-                archetype=inputs["archetype"],
-                emotion=inputs["emotion"],
-                age_range=inputs["age_range"],
-                medium=inputs["medium"],
-                emotional_intensity=inputs["intensity"],
-                situation=inputs["situation"],
-                spoken_to=inputs["spoken_to"],
-                extra=inputs["extra"],
-                target_words=inputs["word_count"],
-            ):
-                st.error("Please fill in all required fields (Situation and Spoken To).")
-                return
-            prompt = build_monologue_prompt(
-                archetype=inputs["archetype"],
-                emotion=inputs["emotion"],
-                age_range=inputs["age_range"],
-                medium=inputs["medium"],
-                intensity=inputs["intensity"],
-                situation=inputs["situation"],
-                spoken_to=inputs["spoken_to"],
-                language=language_mapped,
-                word_count=inputs["word_count"],
-                extra_instructions=inputs["extra"],
-                category=category,
-            )
+        # Backend handles validation and prompt building
+        api_params = {
+            "gender": inputs["gender"],
+            "age": inputs["age_range"],
+            "language": language_mapped,
+            "archetype": inputs.get("archetype"),
+            "emotion": inputs.get("emotion"),
+            "situation": inputs.get("situation"),
+            "medium": inputs.get("medium"),
+            "word_count": str(inputs.get("word_count", 150))
+        }
         
         with st.spinner(random.choice(LOADING_MESSAGES)):
-            result = generate_monologue(
-                prompt=prompt,
-                api_key=api_key,
-                model=model,
-                temperature=temperature,
-            )
+            if generate_another:
+                result = api_client.regenerate_monologue(api_params)
+            else:
+                result = api_client.generate_monologue(api_params)
         
-        if result["success"]:
+        if result.get("success"):
             st.success("Monologue generated successfully!")
-            parsed_content = parse_response(result.get("content", ""))
+            parsed_content = result.get("content", {})
             # Store last result in session state
             st.session_state.last_result = {
                 "inputs": inputs,

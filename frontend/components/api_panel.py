@@ -132,41 +132,13 @@ DEMO_MONOLOGUES = [
 
 
 def get_api_key():
-    """Retrieve the API key from session state."""
-    return st.session_state.get("gemini_api_key", "")
+    """No longer used. Backend handles API keys."""
+    return ""
 
 
 def render_api_panel():
-    """Render the API key panel in the sidebar.
-
-    Returns the current API key (string).
-    """
-    api_key = get_api_key()
-
-    with st.sidebar:
-        st.header("API Key")
-        new_key = st.text_input(
-            "Gemini API Key",
-            value=api_key,
-            type="password",
-            help="Get your API key from https://aistudio.google.com/apikey",
-            key="api_key_input",
-        )
-
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("Save Key", use_container_width=True):
-                if new_key:
-                    st.session_state.gemini_api_key = new_key
-                    st.success("Key saved!")
-                else:
-                    st.warning("Enter a key first.")
-        with col2:
-            if api_key and st.button("Clear Key", use_container_width=True):
-                st.session_state.gemini_api_key = ""
-                st.rerun()
-
-    return new_key if new_key else api_key
+    """No longer used. Backend handles API keys."""
+    return None
 
 
 def render_demo_mode():

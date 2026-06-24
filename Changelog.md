@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.7.0 - 25 June 2026
+
+### Added
+- Two-tier production architecture (Streamlit Frontend + FastAPI Backend)
+- SQLite database integration for saving generations and history
+- API keys moved to backend environment variables (removed from UI)
+- Backend API endpoints (`/health`, `/generate`, `/regenerate`, `/history`, `/analytics`)
+- Simple SHA-256 prompt hashing and caching layer to save API calls
+- Admin dashboard (`/admin`) for monitoring system health and analytics
+- Procfile for Render/Railway deployment support
+
+### Changed
+- Refactored Streamlit app to communicate with FastAPI backend via `api_client`
+- Centralized generation logic and retry mechanisms in backend services
+- Enhanced history panel to fetch data from backend database
+
+### Fixed
+- Fixed `AttributeError: 'NoneType' object has no attribute 'get'` when rendering character cards for demo monologues or responses missing specific sections.
+- Graceful error handling (friendly UI messages) when Gemini API is unavailable or times out.
+
 ## v0.6.0 - 24 June 2026
 
 ### Added
