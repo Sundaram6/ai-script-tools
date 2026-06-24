@@ -1,5 +1,33 @@
 # Changelog
 
+## v0.5.0 - 24 June 2026
+
+### Added
+- Premium component architecture (`components/` directory)
+- Hero section with branded header
+- Sidebar with grouped inputs (Character, Emotional, Performance sections)
+- 5-tab output workspace (Monologue, Character Breakdown, Emotional Beats, Performance Notes, Full Output)
+- Smart response parser with section detection
+- Character summary card above output
+- Monologue reading pane with optimized typography
+- Vertical emotional beat visualization with color-coded progression
+- Performance notes cards with styled headers
+- Copy monologue and copy full output buttons
+- TXT download functionality
+- Rotating loading messages during generation
+- Empty state placeholder before first generation
+- Friendly error messages (no raw exceptions)
+- Mobile-responsive CSS
+- Session memory for last generated result
+- Branding footer
+
+### Changed
+- Restructured into component-based architecture
+- Moved all inputs to sidebar
+- Improved output display with tabbed interface
+
+---
+
 ## v0.4.0 - 24 June 2026
 
 ### Added
