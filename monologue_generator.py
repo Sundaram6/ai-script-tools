@@ -146,6 +146,18 @@ if st.session_state.monologue_history:
             if i < len(st.session_state.monologue_history) - 1:
                 st.divider()
 
+    all_text = "\n\n".join([
+        f"MONOLOGUE -- {h['character_name']}, {h['character_age']} ({h['timestamp']})\n{'='*60}\n{h['monologue']}"
+        for h in st.session_state.monologue_history
+    ])
+    st.download_button(
+        label="Download All History",
+        data=all_text,
+        file_name="monologue_history.txt",
+        mime="text/plain",
+        use_container_width=True,
+    )
+
 st.subheader("Build Your Monologue")
 
 col1, col2 = st.columns(2)
@@ -328,6 +340,13 @@ if generate_btn:
             st.markdown("### Monologue")
             st.markdown(
                 f'<div class="monologue-box">{data["monologue"]}</div>',
+                unsafe_allow_html=True
+            )
+
+            st.markdown(
+                '<button onclick="navigator.clipboard.writeText(document.querySelector(\'.monologue-box\').innerText)" '
+                'style="background:#333;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;margin-top:8px;">'
+                'Copy Monologue</button>',
                 unsafe_allow_html=True
             )
 

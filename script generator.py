@@ -135,6 +135,18 @@ if st.session_state.script_history:
             if i < len(st.session_state.script_history) - 1:
                 st.divider()
 
+    all_text = "\n\n".join([
+        f"SCENE -- {h['scene_heading']} ({h['timestamp']})\n{'='*60}\n{h['scene_text']}"
+        for h in st.session_state.script_history
+    ])
+    st.download_button(
+        label="Download All History",
+        data=all_text,
+        file_name="script_history.txt",
+        mime="text/plain",
+        use_container_width=True,
+    )
+
 st.subheader("Your Scene Brief")
 
 user_request = st.text_area(
@@ -220,6 +232,13 @@ if generate_btn:
             # Scene text
             st.markdown("**Scene**")
             st.markdown(f'<div class="scene-box">{data["scene_text"]}</div>', unsafe_allow_html=True)
+
+            st.markdown(
+                '<button onclick="navigator.clipboard.writeText(document.querySelector(\'.scene-box\').innerText)" '
+                'style="background:#333;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;margin-top:8px;">'
+                'Copy Scene</button>',
+                unsafe_allow_html=True
+            )
 
             st.divider()
 
