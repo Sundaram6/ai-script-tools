@@ -129,7 +129,7 @@ _BEAT_LABELS = [
 
 
 def render_output_tabs(inputs: dict, parsed_content: dict):
-    """Render the output workspace with 5 tabs.
+    """Render the output workspace with 4 premium tabs.
 
     Args:
         inputs: Dictionary of user inputs.
@@ -137,28 +137,43 @@ def render_output_tabs(inputs: dict, parsed_content: dict):
     """
     st.markdown(_MONOLOGUE_CSS, unsafe_allow_html=True)
 
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab1, tab2, tab3, tab4 = st.tabs([
         "🎬 Monologue",
-        "🧠 Character Breakdown",
-        "🎭 Emotional Beats",
-        "🎤 Performance Notes",
-        "📄 Full Output",
+        "🧠 Character",
+        "🎤 Acting Notes",
+        "📄 Full Package",
     ])
 
     with tab1:
         _render_monologue(parsed_content)
 
     with tab2:
-        _render_breakdown(parsed_content)
+        _render_character(parsed_content)
 
     with tab3:
-        _render_beats(parsed_content)
+        _render_acting_notes(parsed_content)
 
     with tab4:
-        _render_performance_notes(parsed_content)
+        _render_full_package(parsed_content)
 
-    with tab5:
-        _render_full_output(parsed_content)
+
+def _render_character(parsed_content: dict):
+    """Render character breakdown and emotional beats."""
+    _render_breakdown(parsed_content)
+    _render_beats(parsed_content)
+
+
+def _render_acting_notes(parsed_content: dict):
+    """Render performance notes."""
+    _render_performance_notes(parsed_content)
+
+
+def _render_full_package(parsed_content: dict):
+    """Render all sections combined."""
+    _render_monologue(parsed_content)
+    _render_breakdown(parsed_content)
+    _render_beats(parsed_content)
+    _render_performance_notes(parsed_content)
 
 
 def _render_monologue(parsed_content: dict):

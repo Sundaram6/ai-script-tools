@@ -63,9 +63,10 @@ Return ONLY valid JSON in this exact structure:
   "character_profile": {{
     "name": "A fitting name for this character",
     "age": "Age as a number",
+    "occupation": "The character's job or role in society",
     "background": "Two to three sentences — who this person is, where they come from, and what they carry",
-    "core_desire": "What this character wants more than anything",
-    "biggest_fear": "What they are most afraid of losing or facing"
+    "core_wound": "The deep emotional pain that drives this character's behavior",
+    "goal": "What this character wants more than anything in this scene"
   }},
   "character_breakdown": {{
     "objective": "What does this character want more than anything in this moment?",
@@ -145,9 +146,10 @@ Return ONLY valid JSON in this exact structure:
   "character_profile": {{
     "name": "A fitting name for this character",
     "age": "Age as a number",
+    "occupation": "The character's job or role in society",
     "background": "Two to three sentences — who this person is, where they come from, and what they carry",
-    "core_desire": "What this character wants more than anything",
-    "biggest_fear": "What they are most afraid of losing or facing"
+    "core_wound": "The deep emotional pain that drives this character's behavior",
+    "goal": "What this character wants more than anything in this scene"
   }},
   "character_breakdown": {{
     "objective": "What does this character want more than anything in this moment?",

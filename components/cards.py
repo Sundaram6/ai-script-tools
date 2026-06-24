@@ -16,6 +16,9 @@ def render_character_card(inputs: dict, parsed_content: dict):
     
     # Get age from profile or use age_range from inputs
     age = character_profile.get("age", inputs.get("age_range", "N/A"))
+    occupation = character_profile.get("occupation", "N/A")
+    core_wound = character_profile.get("core_wound", "N/A")
+    goal = character_profile.get("goal", "N/A")
     
     archetype = inputs.get("archetype", "N/A")
     emotion = inputs.get("emotion", "N/A")
@@ -33,6 +36,9 @@ def render_character_card(inputs: dict, parsed_content: dict):
         ">
             <h3 style="margin-top: 0; color: #333;">🎭 {character_name}</h3>
             <p style="margin: 5px 0;"><strong>Age:</strong> {age}</p>
+            <p style="margin: 5px 0;"><strong>Occupation:</strong> {occupation}</p>
+            <p style="margin: 5px 0;"><strong>Core Wound:</strong> {core_wound}</p>
+            <p style="margin: 5px 0;"><strong>Goal:</strong> {goal}</p>
             <p style="margin: 5px 0;"><strong>Archetype:</strong> {archetype}</p>
             <p style="margin: 5px 0;"><strong>Emotion:</strong> {emotion}</p>
             <p style="margin: 5px 0;"><strong>Medium:</strong> {medium}</p>
