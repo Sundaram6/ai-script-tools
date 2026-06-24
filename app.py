@@ -4,7 +4,7 @@ import random
 
 import streamlit as st
 
-from prompts import build_monologue_prompt
+from prompts import build_monologue_prompt, build_smart_monologue_prompt
 from generator import generate_monologue
 from utils import validate_inputs, clean_response
 
@@ -158,33 +158,43 @@ def main():
         
         language_mapped = LANGUAGE_MAP.get(inputs["language"], inputs["language"])
         
-        if not validate_inputs(
-            language=language_mapped,
-            archetype=inputs["archetype"],
-            emotion=inputs["emotion"],
-            age_range=inputs["age_range"],
-            medium=inputs["medium"],
-            emotional_intensity=inputs["intensity"],
-            situation=inputs["situation"],
-            spoken_to=inputs["spoken_to"],
-            extra=inputs["extra"],
-            target_words=inputs["word_count"],
-        ):
-            st.error("Please fill in all required fields (Situation and Spoken To).")
-            return
-        
-        prompt = build_monologue_prompt(
-            archetype=inputs["archetype"],
-            emotion=inputs["emotion"],
-            age_range=inputs["age_range"],
-            medium=inputs["medium"],
-            intensity=inputs["intensity"],
-            situation=inputs["situation"],
-            spoken_to=inputs["spoken_to"],
-            language=language_mapped,
-            word_count=inputs["word_count"],
-            extra_instructions=inputs["extra"],
-        )
+        # Check if situation is empty to decide between smart or full generation
+        situation_filled = inputs["situation"].strip()
+        if not situation_filled:
+            # Smart generation: user only provided gender, age, language
+            prompt = build_smart_monologue_prompt(
+                gender=inputs["gender"],
+                age=inputs["age_range"],
+                language=language_mapped,
+            )
+        else:
+            # Full generation: validate all inputs
+            if not validate_inputs(
+                language=language_mapped,
+                archetype=inputs["archetype"],
+                emotion=inputs["emotion"],
+                age_range=inputs["age_range"],
+                medium=inputs["medium"],
+                emotional_intensity=inputs["intensity"],
+                situation=inputs["situation"],
+                spoken_to=inputs["spoken_to"],
+                extra=inputs["extra"],
+                target_words=inputs["word_count"],
+            ):
+                st.error("Please fill in all required fields (Situation and Spoken To).")
+                return
+            prompt = build_monologue_prompt(
+                archetype=inputs["archetype"],
+                emotion=inputs["emotion"],
+                age_range=inputs["age_range"],
+                medium=inputs["medium"],
+                intensity=inputs["intensity"],
+                situation=inputs["situation"],
+                spoken_to=inputs["spoken_to"],
+                language=language_mapped,
+                word_count=inputs["word_count"],
+                extra_instructions=inputs["extra"],
+            )
         
         with st.spinner(random.choice(LOADING_MESSAGES)):
             result = generate_monologue(
