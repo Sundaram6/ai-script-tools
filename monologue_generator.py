@@ -1,7 +1,5 @@
-import json
 import time
-from google import genai
-from google.genai import types
+from gemini_client import generate_json
 import streamlit as st
 
 # ── PAGE CONFIG ─────────────────────────────────────
@@ -212,31 +210,19 @@ generate_btn = st.button(
 
 # ── GENERATION FUNCTION ──────────────────────────────
 def generate_monologue(api_key, model, temperature, system_instruction, prompt):
-    client = genai.Client(api_key=api_key)
+    """Generate a monologue using the shared Gemini client."""
+    def on_retry(attempt, wait):
+        st.warning(f"Quota hit. Retrying in {wait}s... ({attempt + 1}/3)")
 
-    for attempt in range(3):
-        try:
-            response = client.models.generate_content(
-                model=model,
-                config=types.GenerateContentConfig(
-                    system_instruction=system_instruction,
-                    temperature=temperature
-                ),
-                contents=prompt
-            )
-            return response.text
-
-        except Exception as e:
-            if "429" in str(e):
-                wait = 30 * (attempt + 1)
-                st.warning(f"Quota hit. Retrying in {wait}s... ({attempt + 1}/3)")
-                time.sleep(wait)
-            else:
-                st.error(f"Error: {e}")
-                return None
-
-    st.error("All retries failed. Switch model or wait a few minutes.")
-    return None
+    return generate_json(
+        api_key=api_key,
+        model=model,
+        temperature=temperature,
+        system_instruction=system_instruction,
+        prompt=prompt,
+        max_retries=3,
+        on_retry=on_retry,
+    )
 
 def build_prompt(
     archetype, emotion, age_range, medium,
@@ -296,83 +282,74 @@ if generate_btn:
         )
 
         with st.spinner("Writing your monologue..."):
-            raw_text = generate_monologue(
+            data = generate_monologue(
                 api_key, model_choice, temperature,
                 system_instruction, prompt
             )
 
-        if raw_text:
-            clean_text = raw_text.strip()
-            if clean_text.startswith("```"):
-                clean_text = clean_text.split("```")[1]
-                if clean_text.startswith("json"):
-                    clean_text = clean_text[4:]
+        if data:
+            st.divider()
 
-            try:
-                data = json.loads(clean_text.strip())
+            # ── CHARACTER CARD ───────────────────────────
+            st.markdown("### Character")
+            with st.container(border=True):
+                col1, col2 = st.columns([1, 2])
 
-                st.divider()
+                with col1:
+                    st.markdown("**Name & Age**")
+                    st.write(f"{data['character_name']}, {data['character_age']}")
 
-                # ── CHARACTER CARD ───────────────────────────
-                st.markdown("### Character")
-                with st.container(border=True):
-                    col1, col2 = st.columns([1, 2])
+                    st.markdown("**Speaking To**")
+                    st.write(data["spoken_to"])
 
-                    with col1:
-                        st.markdown("**Name & Age**")
-                        st.write(f"{data['character_name']}, {data['character_age']}")
+                with col2:
+                    st.markdown("**Who They Are**")
+                    st.write(data["character_description"])
 
-                        st.markdown("**Speaking To**")
-                        st.write(data["spoken_to"])
+                    st.markdown("**Emotional Arc**")
+                    st.write(data["emotional_arc"])
 
-                    with col2:
-                        st.markdown("**Who They Are**")
-                        st.write(data["character_description"])
+            st.divider()
 
-                        st.markdown("**Emotional Arc**")
-                        st.write(data["emotional_arc"])
+            # ── MONOLOGUE ────────────────────────────────
+            st.markdown("### Monologue")
+            st.markdown(
+                f'<div class="monologue-box">{data["monologue"]}</div>',
+                unsafe_allow_html=True
+            )
 
-                st.divider()
+            # ── DIRECTOR NOTE + PRACTICE TIP ────────────
+            st.markdown(
+                f'<div class="practice-tip">🎬 <strong>Director\'s Note:</strong> {data["director_note"]}<br><br>'
+                f'🎯 <strong>Practice Tip for You:</strong> {data["practice_tip"]}</div>',
+                unsafe_allow_html=True
+            )
 
-                # ── MONOLOGUE ────────────────────────────────
-                st.markdown("### Monologue")
-                st.markdown(
-                    f'<div class="monologue-box">{data["monologue"]}</div>',
-                    unsafe_allow_html=True
-                )
+            st.divider()
 
-                # ── DIRECTOR NOTE + PRACTICE TIP ────────────
-                st.markdown(
-                    f'<div class="practice-tip">🎬 <strong>Director\'s Note:</strong> {data["director_note"]}<br><br>'
-                    f'🎯 <strong>Practice Tip for You:</strong> {data["practice_tip"]}</div>',
-                    unsafe_allow_html=True
-                )
+            # ── ACTING COACH SECTION ─────────────────────
+            st.markdown("### 🎓 Acting Coach Notes")
+            with st.container(border=True):
+                col1, col2 = st.columns(2)
 
-                st.divider()
+                with col1:
+                    st.markdown("**🎯 Objective**")
+                    st.write(data.get("objective", "—"))
 
-                # ── ACTING COACH SECTION ─────────────────────
-                st.markdown("### 🎓 Acting Coach Notes")
-                with st.container(border=True):
-                    col1, col2 = st.columns(2)
+                    st.markdown("**🧱 Obstacle**")
+                    st.write(data.get("obstacle", "—"))
 
-                    with col1:
-                        st.markdown("**🎯 Objective**")
-                        st.write(data.get("objective", "—"))
+                with col2:
+                    st.markdown("**💬 Subtext**")
+                    st.write(data.get("subtext", "—"))
 
-                        st.markdown("**🧱 Obstacle**")
-                        st.write(data.get("obstacle", "—"))
+                    st.markdown("**🗺️ Given Circumstances**")
+                    st.write(data.get("given_circumstances", "—"))
 
-                    with col2:
-                        st.markdown("**💬 Subtext**")
-                        st.write(data.get("subtext", "—"))
+            st.divider()
 
-                        st.markdown("**🗺️ Given Circumstances**")
-                        st.write(data.get("given_circumstances", "—"))
-
-                st.divider()
-
-                # ── DOWNLOAD ─────────────────────────────────
-                full_output = f"""MONOLOGUE — {data['character_name']}, {data['character_age']}
+            # ── DOWNLOAD ─────────────────────────────────
+            full_output = f"""MONOLOGUE — {data['character_name']}, {data['character_age']}
 {'='*60}
 CHARACTER: {data['character_description']}
 SITUATION: {data['situation_summary']}
@@ -395,14 +372,13 @@ SUBTEXT: {data.get('subtext', '—')}
 GIVEN CIRCUMSTANCES: {data.get('given_circumstances', '—')}
 """
 
-                st.download_button(
-                    label="⬇️ Download Monologue",
-                    data=full_output,
-                    file_name=f"monologue_{data['character_name'].lower().replace(' ', '_')}.txt",
-                    mime="text/plain",
-                    use_container_width=True
-                )
+            st.download_button(
+                label="⬇️ Download Monologue",
+                data=full_output,
+                file_name=f"monologue_{data['character_name'].lower().replace(' ', '_')}.txt",
+                mime="text/plain",
+                use_container_width=True
+            )
 
-            except json.JSONDecodeError:
-                st.error("Couldn't parse response. Raw output:")
-                st.code(raw_text)
+        else:
+            st.error("Couldn't parse response. Try again.")
