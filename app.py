@@ -10,6 +10,7 @@ from utils import validate_inputs, clean_response
 
 from components.hero import render_hero
 from components.sidebar import render_sidebar, LANGUAGE_MAP
+from components.api_panel import render_api_panel, render_demo_mode
 from components.parser import parse_response
 from components.output_tabs import render_output_tabs
 from components.cards import render_character_card
@@ -101,13 +102,42 @@ def main():
     # Render hero
     render_hero()
     
+    # Render API key panel and get key
+    api_key = render_api_panel()
+    
     # Render sidebar and get inputs
-    inputs, api_key, model, temperature = render_sidebar()
+    inputs, model, temperature = render_sidebar()
+    
+    # Demo mode
+    demo_monologue = render_demo_mode()
+    if demo_monologue:
+        inputs["archetype"] = demo_monologue["archetype"]
+        inputs["emotion"] = demo_monologue["emotion"]
+        inputs["age_range"] = demo_monologue["age_range"]
+        inputs["medium"] = demo_monologue["medium"]
+        inputs["language"] = demo_monologue["language"]
+        inputs["intensity"] = demo_monologue["intensity"]
+        inputs["situation"] = demo_monologue["situation"]
+        inputs["spoken_to"] = demo_monologue["spoken_to"]
+        inputs["word_count"] = demo_monologue["word_count"]
+        parsed_content = parse_response(demo_monologue["monologue"])
+        st.session_state.last_result = {
+            "inputs": inputs,
+            "parsed_content": parsed_content,
+        }
+        st.success("Demo monologue loaded!")
+        render_character_card(inputs, parsed_content)
+        render_output_tabs(inputs, parsed_content)
+        render_footer()
+        return
     
     # Generate button
     if st.button("Generate Monologue", type="primary", use_container_width=True):
         if not api_key:
-            st.error("Please enter your Gemini API Key in the sidebar.")
+            st.error(
+                "Please enter your Gemini API Key in the sidebar, "
+                "or try Demo Mode above."
+            )
             return
         
         language_mapped = LANGUAGE_MAP.get(inputs["language"], inputs["language"])

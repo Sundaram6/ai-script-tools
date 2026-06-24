@@ -46,15 +46,10 @@ def render_sidebar():
     """Render the settings and input sidebar.
     
     Returns:
-        Tuple of (inputs_dict, api_key, model, temperature)
+        Tuple of (inputs_dict, model, temperature)
     """
     with st.sidebar:
         st.header("Settings")
-        api_key = st.text_input(
-            "Gemini API Key",
-            type="password",
-            help="Get your API key from https://aistudio.google.com/apikey",
-        )
         model = st.selectbox("Model", MODELS, index=0)
         temperature = st.slider("Temperature", 0.0, 2.0, 1.2, 0.1)
         
@@ -106,4 +101,4 @@ def render_sidebar():
         "extra": extra,
     }
     
-    return inputs, api_key, model, temperature
+    return inputs, model, temperature
